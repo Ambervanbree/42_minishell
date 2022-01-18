@@ -6,12 +6,12 @@
 #    By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/14 15:32:57 by avan-bre          #+#    #+#              #
-#    Updated: 2021/12/29 17:56:00 by avan-bre         ###   ########.fr        #
+#    Updated: 2022/01/18 11:54:23 by avan-bre         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 ################################################################################
-#                                 INFO                                         #
+#                                 COMPILATION                                  #
 ################################################################################
 
 NAME	=	minishell
@@ -21,16 +21,23 @@ RM		=	@rm -rf
 CC		=	@clang
 IFLAGS	=	-I. -Ilibft
 RLFLAGS	=	-lreadline
-CFLAGS	:=	-Wall -Werror -Wextra $(IFLAGS)
+SFLAGS	=	-fsanitize=address -g3 
+CFLAGS	:=	-Wall -Werror -Wextra $(IFLAGS) 
 LFLAGS	:=	-Llibft -lft
-SRCS	=	minishell.c \
-			execution/exec.c execution/builtins.c execution/nonbuiltins.c \
-			execution/builtins_env.c execution/exec_utils.c \
-			execution/builtins_dir.c execution/builtins_cd.c
+
+################################################################################
+#                                    FILES                                     #
+################################################################################
+
+SRCS	=	minishell.c $(addprefix $(E_DIR), $(E_SRCS))
+E_SRCS	=	redirection.c builtins.c BI_cd.c BI_env_echo_pwd.c BI_export.c \
+			BI_unset.c
 B_SRCS	=	
 S_DIR	=	sources/
 B_DIR	=	bonus_sources/
+E_DIR	=	execution/
 OBJS	=	$(addprefix $(S_DIR), $(SRCS:.c=.o))
+E_OBJS	=	$(addprefix $(E_DIR), $(B_SRCS:.c=.o))
 B_OBJS	=	$(addprefix $(B_DIR), $(B_SRCS:.c=.o))
 
 ################################################################################
@@ -38,13 +45,13 @@ B_OBJS	=	$(addprefix $(B_DIR), $(B_SRCS:.c=.o))
 ################################################################################
 
 .c.o:
-	$(CC) $(CFLAGS) -c $< -o $(<:.c=.o)
+	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $(<:.c=.o)
 
 all:		$(NAME)
 
-$(NAME):	$(OBJS) $(LIBFT)
+$(NAME):	$(OBJS) $(E_OBJS) $(LIBFT)
 	@echo "Compiling sources.."
-	$(CC) $(OBJS) $(LFLAGS) -o $@ $(RLFLAGS)
+	$(CC) $(SFLAGS) $(OBJS) $(E_OBJS) $(LFLAGS) -o $@ $(RLFLAGS)
 	@echo "Ready!"
 
 $(LIBFT):
@@ -58,7 +65,7 @@ bonus:	${B_OBJS} ${LIBFT}
 	@echo "Ready!"
 
 clean:
-	$(RM) $(OBJS) ${B_OBJS}
+	$(RM) $(OBJS) $(E_OBJS) ${B_OBJS}
 	@make $@ -s -C libft
 	@echo "Removed objects"
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_cd.c                                      :+:      :+:    :+:   */
+/*   BI_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 10:17:40 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/04 09:34:36 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/18 12:11:10 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	handle_dots(t_data *data)
 	int		i;
 
 	dir_tab = ft_split(data->params[1], '/');
+	//dirtab needs to be freed
 	i = 0;
 	path = getcwd(NULL, 0);
 	while (dir_tab[i])
@@ -63,7 +64,22 @@ void	handle_dots(t_data *data)
 	}
 	if (chdir(path) == -1)
 		perror("error - cd");
-	//free everything
+}
+
+void	finish_cd(t_data *data, char *pwd, char *oldpwd)
+{
+	size_t	i;
+
+	i = ft_strlen(pwd);
+	if (ft_strlen(oldpwd) > i)
+		i = ft_strlen(oldpwd);
+	if (ft_strncmp(pwd, oldpwd, i) != 0)
+	{
+		oldpwd = ft_strjoin("OLDPWD=", oldpwd);
+		add_to_envp(data, oldpwd);
+		pwd = ft_strjoin("PWD=", pwd);
+		add_to_envp(data, pwd);
+	}
 }
 
 void	ft_cd(t_data *data)
@@ -71,8 +87,7 @@ void	ft_cd(t_data *data)
 	char	*oldpwd;
 	char	*pwd;
 	
-	oldpwd = ft_strjoin("OLDPWD=", getcwd(NULL, 0));
-	ft_export(oldpwd, data);
+	oldpwd = getcwd(NULL, 0);
 	if (data->params[1] == NULL)
 	{
 		if (getenv("HOME") != NULL)
@@ -86,6 +101,6 @@ void	ft_cd(t_data *data)
 	}
 	else
 		handle_dots(data);
-	pwd = ft_strjoin("PWD=", getcwd(NULL, 0));
-	ft_export(pwd, data);
+	pwd = getcwd(NULL, 0);
+	finish_cd(data, pwd, oldpwd);
 }
