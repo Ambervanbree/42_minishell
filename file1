@@ -25,4 +25,5 @@ VSCODE_GIT_ASKPASS_NODE=/Applications/Visual Studio Code.app/Contents/Frameworks
 VSCODE_GIT_ASKPASS_EXTRA_ARGS=--ms-enable-electron-run-as-node
 VSCODE_GIT_ASKPASS_MAIN=/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js
 TERM=xterm-256color
+name=hallo
 _=/Users/avan-bre/Projects/Circle03/minishell_git/./minishell

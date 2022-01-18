@@ -34,11 +34,34 @@ int		check_identifier_unset(char *id)
 	return (1);
 }
 
+void	update_env(t_data *data, int index)
+{
+	char	**temp;
+	int		i;
+	int		j;
+
+	i = 0;
+	while (data->envp[i])
+		i++;
+	temp = data->envp;
+	data->envp = ft_calloc(i, sizeof(char *));
+	j = -1;
+	while (++j < index)
+		data->envp[j] = temp[j];
+	while (j < (i - 1))
+	{
+		data->envp[j] = temp[j + 1];
+		j++;
+	}
+	free(data->envp[j]);
+	data->envp[j] = NULL;
+}
+
 void	ft_unset(t_data *data)
 {
-	int	i;
-	int	j;
-	int	len;
+	int		i;
+	int		j;
+	int		len;
 
 	i = 0;
 	while (data->params[++i])
@@ -51,13 +74,17 @@ void	ft_unset(t_data *data)
 				len = ft_strlen(data->params[i]);
 				if (ft_strncmp(data->params[i], data->envp[j], len) == 0
 					&& (data->envp[j][len] == '=' || data->envp[j][len] == '\0'))
-					while (data->envp[j + 1])
-					{
-						data->envp[j] = data->envp[j + 1];
-						j++;
-					}
+				{
+					update_env(data, j);
+					// while (data->envp[j + 1])
+					// {
+					// 	data->envp[j] = data->envp[j + 1];
+					// 	j++;
+					// }
+					// free(data)
+					// data->envp[j] = NULL;
+				}
 			}
-			data->envp[j - 1] = NULL;
 		}
 	}
 }

@@ -82,6 +82,26 @@ void	finish_cd(t_data *data, char *pwd, char *oldpwd)
 	}
 }
 
+void	find_home_cd(t_data *data)
+{
+	int		i;
+	char	*temp;
+
+	i = -1;
+	temp = NULL;
+	while (data->envp[++i])
+	{
+		if (ft_strncmp("HOME=", data->envp[i], 5) == 0)
+		{
+			temp = ft_substr(data->envp[i], 5, ft_strlen(data->envp[i]));
+			if (chdir(temp) == -1)
+				perror("error - cd");
+		}
+	}
+	free(temp);
+	temp = NULL;
+}
+
 void	ft_cd(t_data *data)
 {
 	char	*oldpwd;
@@ -89,11 +109,7 @@ void	ft_cd(t_data *data)
 	
 	oldpwd = getcwd(NULL, 0);
 	if (data->params[1] == NULL)
-	{
-		if (getenv("HOME") != NULL)
-			if (chdir(getenv("HOME")) == -1)
-				perror("error - cd");
-	}
+		find_home_cd(data);
 	else if (data->params[1][0] == '/')
 	{
 		if (chdir(data->params[1]) == -1)

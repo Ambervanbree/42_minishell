@@ -18,20 +18,40 @@ void	ft_pwd(void)
 	exit(0);
 }
 
-void	ft_echo(t_data *data)
+int	no_backslash(t_data *data)
 {
 	int	i;
 
-	i = 0;
-	if (data->params[1] == NULL)
-		ft_printf("\n");
+	i = 1;
+	while (data->params[1][i] == 'n')
+		i++;
+	if (data->params[1][i] != '\0')
+		return (0);
 	else
+		return (1);
+}
+
+void	ft_echo(t_data *data)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	if (data->params[1] == NULL)
 	{
-		i = 0;
-		while (data->params[++i] && data->params[i + 1])
-			ft_printf("%s ", data->params[i]);
+		ft_printf("\n");
+		return ;
 	}
-	ft_printf("%s\n", data->params[i]);
+	else if (ft_strncmp(data->params[1], "-n", 2) == 0)
+		j = no_backslash(data);
+	i = j;
+	while (data->params[++i] && data->params[i + 1])
+		ft_printf("%s ", data->params[i]);
+	if (j)
+		ft_printf("%s", data->params[i]);
+	else
+		ft_printf("%s\n", data->params[i]);
 	exit(0);
 }
 
@@ -40,7 +60,10 @@ void	ft_env(t_data *data)
 	int	i;
 
 	i = -1;
-	while (data->envp[++i] && ft_strrchr(data->envp[i], '='))
-		ft_printf("%s\n", data->envp[i]);
+	while (data->envp[++i])
+	{
+		if (ft_strrchr(data->envp[i], '='))
+			ft_printf("%s\n", data->envp[i]);
+	}
 	exit (0);
 }
