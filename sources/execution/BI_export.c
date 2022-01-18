@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 16:43:49 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/18 11:47:09 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/18 13:57:05 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,8 @@ int	add_if_existing(t_data *data, int i, int set, char *var)
 				return (0);
 			else
 			{
-				printf("Data->envp: %s, %p\n", data->envp[j], data->envp[j]);
-				printf("New var: %s, %p\n", var, var);
 				temp = data->envp[j];
 				data->envp[j] = var;
-				printf("free %s, %p\n", temp, temp);
 				if (temp)
 				{
 					free(temp);
@@ -70,9 +67,10 @@ int	add_if_existing(t_data *data, int i, int set, char *var)
 
 void	add_to_envp(t_data *data, char *var)
 {
-	int	i;
-	int	set;
-	int	j;
+	int		i;
+	int		set;
+	int		j;
+	char	**temp;
 
 	set = 0;
 	if (ft_strrchr(var, '='))
@@ -83,9 +81,16 @@ void	add_to_envp(t_data *data, char *var)
 	j = add_if_existing(data, i, set, var);
 	if (j)
 	{
-		data->envp[j] = data->envp[j - 1];
-		data->envp[j - 1] = var;
-		data->envp[j + 1] = NULL;
+		temp = data->envp;
+		data->envp = ft_calloc(j + 2, sizeof(char *));
+		i = -1;
+		while (++i < j - 1)
+			data->envp[i] = temp[i];
+		data->envp[i] = ft_strdup(var);
+		data->envp[i + 1] = temp[j - 1];
+		data->envp[i + 2] = NULL;
+		free(temp);
+		temp = NULL;
 	}
 }
 
@@ -95,7 +100,8 @@ int	check_identifier_export(char *id)
 
 	if (ft_isdigit(id[0]) || id == '\0')
 	{
-		ft_printf("%s: '%s': %s\n", "export", id, "not a valid identifier");
+		ft_printf("%s: '%s': %s\n", "export",
+			id, "not a valid identifier");
 		return (0);
 	}
 	i = -1;
@@ -103,7 +109,8 @@ int	check_identifier_export(char *id)
 	{
 		if (!(ft_isalnum(id[i]) || (id[i] == '_')))
 		{
-			ft_printf("%s: '%s': %s\n", "export", id, "not a valid identifier");
+			ft_printf("%s: '%s': %s\n", "export",
+				id, "not a valid identifier");
 			//should make ft_printf_fd here maybe to print on stderr
 			return (0);
 		}
@@ -114,7 +121,6 @@ int	check_identifier_export(char *id)
 void	ft_export(t_data *data)
 {
 	int		i;
-	char	*temp;
 
 	i = -1;
 	if (data->params[1] == NULL)
@@ -122,18 +128,13 @@ void	ft_export(t_data *data)
 		print_exported_variables(data);
 		return ;
 	}
-	i = 0;
-	while (data->params[++i])
+	else
 	{
-		if (check_identifier_export(data->params[i]))
+		i = 0;
+		while (data->params[++i])
 		{
-			temp = malloc(sizeof(char) * (ft_strlen(data->params[i]) + 1));
-			if (temp == NULL)
-			{
-				perror("malloc failed");
-				return ;
-			}
-			add_to_envp(data, temp);
+			if (check_identifier_export(data->params[i]))
+				add_to_envp(data, data->params[i]);
 		}
 	}
 }
