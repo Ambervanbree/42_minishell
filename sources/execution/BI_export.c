@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bi_export.c                                        :+:      :+:    :+:   */
+/*   BI_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 16:43:49 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/18 13:57:05 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/19 17:11:25 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,12 @@ void	print_exported_variables(t_data *data)
 {
 	int		i;
 	int		j;
+	int		k;
 	char	*var;
 	char	*name;
 
 	i = -1;
+	k = 0;
 	while (data->envp[++i])
 	{
 		if (!ft_strrchr(data->envp[i], '='))
@@ -33,7 +35,10 @@ void	print_exported_variables(t_data *data)
 			var = ft_substr(data->envp[i], j + 1, ft_strlen(data->envp[i]));
 			ft_printf("%s %s%c\"%s\"\n", "declare -x", name, '=', var);
 		}
+		if (data->envp[i][0] == '_' && data->envp[i][1] == '=')
+			k = i;
 	}
+	remove_from_envp(data, k);
 }
 
 int	add_if_existing(t_data *data, int i, int set, char *var)
@@ -84,11 +89,10 @@ void	add_to_envp(t_data *data, char *var)
 		temp = data->envp;
 		data->envp = ft_calloc(j + 2, sizeof(char *));
 		i = -1;
-		while (++i < j - 1)
+		while (++i < j)
 			data->envp[i] = temp[i];
 		data->envp[i] = ft_strdup(var);
-		data->envp[i + 1] = temp[j - 1];
-		data->envp[i + 2] = NULL;
+		data->envp[i + 1] = NULL;
 		free(temp);
 		temp = NULL;
 	}
@@ -118,23 +122,23 @@ int	check_identifier_export(char *id)
 	return (1);
 }
 
-void	ft_export(t_data *data)
+void	ft_export(t_cmd *cmd)
 {
 	int		i;
 
 	i = -1;
-	if (data->params[1] == NULL)
+	if (cmd->params[1] == NULL)
 	{
-		print_exported_variables(data);
+		print_exported_variables(cmd->data);
 		return ;
 	}
 	else
 	{
 		i = 0;
-		while (data->params[++i])
+		while (cmd->params[++i])
 		{
-			if (check_identifier_export(data->params[i]))
-				add_to_envp(data, data->params[i]);
+			if (check_identifier_export(cmd->params[i]))
+				add_to_envp(cmd->data, cmd->params[i]);
 		}
 	}
 }

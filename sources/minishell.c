@@ -6,15 +6,15 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:32:53 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/18 13:34:56 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/19 17:17:53 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	exec_nonbuiltins(t_data *data)
+int	exec_nonbuiltins(t_cmd *cmd)
 {
-	if (execve(data->params[0], data->params, data->envp) == -1)
+	if (execve(cmd->params[0], cmd->params, cmd->data->envp) == -1)
 	{
 		//some kind of free function
 		perror("error - execution fail");
@@ -23,25 +23,25 @@ int	exec_nonbuiltins(t_data *data)
 	exit (0);
 }
 
-int	fork_function(t_data *data)
+int	fork_function(t_cmd *cmd)
 {
-	data->process_id[data->cmd_nr] = fork();
-	if (data->process_id[data->cmd_nr] == -1)
+	cmd->data->process_id[cmd->id] = fork();
+	if (cmd->data->process_id[cmd->id] == -1)
 	{
 		perror("error - fork failed");
 		return (-1);
 	}
-	else if (data->process_id[data->cmd_nr] == 0)
+	else if (cmd->data->process_id[cmd->id] == 0)
 	{
-		if (redirect_or_pipe(data) == 0)
+		if (redirect_or_pipe(cmd) == 0)
 			return (-1);
-		if (exec_builtins(data) == 1)
+		if (exec_builtins(cmd) == 1)
 			return (1);
-		else if (exec_nonbuiltins(data) == 1)
+		else if (exec_nonbuiltins(cmd) == 1)
 			return (2);
 	}
 	else
-		waitpid(data->process_id[data->cmd_nr], NULL, 0);
+		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
 	return (1);
 }
 
@@ -83,30 +83,71 @@ int	init_envp(t_data *data, char *envp[])
 	return (1);
 }
 
+void	init_commands(t_data *data, char *command_in)
+{
+	int		i;
+	char	**commands;
+
+	commands = ft_split(command_in, '*');
+	i = 0;
+	while (commands[i])
+		i++;
+	data->nr_cmds = i;
+	data->nr_pipes = i - 1;
+	data->cmd = malloc(sizeof(t_cmd) * data->nr_cmds);
+	if (!data->cmd)
+		printf("Aaaaaahhhhh\n");
+	i = -1;
+	while (++i < data->nr_cmds)
+	{
+		data->cmd[i].params = ft_split(commands[i], ' ');
+		data->cmd[i].o_file = NULL;
+		data->cmd[i].i_file = NULL;
+		data->cmd[i].id = i;
+		data->cmd[i].data = data;
+	}
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	char	*command_in;
 	t_data	data;
+	int		i;
 
 	argc = 0;
 	init_envp(&data, envp);
 	// not sure to protect with if -1, exit
 	argv = NULL;
-	command_in = readline("Our_minishell\% ");
+	ft_printf("Our_minishell%% ");
+	command_in = get_next_line(STDIN_FILENO);
+	i = 0;
+	while (!(command_in[i] == '\n' && command_in[i] != '\0'))
+		i++;
+	command_in[i] = '\0';
 	while (command_in != 0)
 	{
-		data.nr_cmds = 1;
-		data.cmd_nr = 0;
-		data.o_file = NULL;
-		data.i_file = NULL;
-		data.nr_pipes = 0;
-		data.params = ft_split(command_in, ' ');
-		// parsing should happen here
-		if (exec_prefork_builtins(&data) == 0)
-			fork_function(&data);
+		if (command_in)
+		{
+			// lexer + parser
+			init_commands(&data, command_in);
+			i = -1;
+			// while (++i < data.nr_cmds)
+			// 	ft_printf("%s\n", data.cmd[i].params[0]);
+			i = -1;
+			while (++i < data.nr_cmds)
+			{
+				if (exec_prefork_builtins(&data.cmd[i])	== 0)
+					fork_function(&data.cmd[i]);
+			}
+		}
 		//return is -1 on error, but not sure what to do with it
 		free(command_in);
 		command_in = NULL;
-		command_in = readline("Our_minishell\% ");
+		ft_printf("Our_minishell%% ");
+		command_in = get_next_line(STDIN_FILENO);
+		i = 0;
+		while (!(command_in[i] == '\n' && command_in[i] != '\0'))
+			i++;
+		command_in[i] = '\0';
 	}
 }

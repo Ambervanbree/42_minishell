@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 14:07:45 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/17 13:50:18 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/19 16:17:04 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int		check_identifier_unset(char *id)
 	return (1);
 }
 
-void	update_env(t_data *data, int index)
+void	remove_from_envp(t_data *data, int index)
 {
 	char	**temp;
 	int		i;
@@ -57,33 +57,24 @@ void	update_env(t_data *data, int index)
 	data->envp[j] = NULL;
 }
 
-void	ft_unset(t_data *data)
+void	ft_unset(t_cmd *cmd)
 {
 	int		i;
 	int		j;
 	int		len;
 
 	i = 0;
-	while (data->params[++i])
+	while (cmd->params[++i])
 	{
-		if (check_identifier_unset(data->params[i]))
+		if (check_identifier_unset(cmd->params[i]))
 		{
 			j = -1;
-			while (data->envp[++j])
+			while (cmd->data->envp[++j])
 			{
-				len = ft_strlen(data->params[i]);
-				if (ft_strncmp(data->params[i], data->envp[j], len) == 0
-					&& (data->envp[j][len] == '=' || data->envp[j][len] == '\0'))
-				{
-					update_env(data, j);
-					// while (data->envp[j + 1])
-					// {
-					// 	data->envp[j] = data->envp[j + 1];
-					// 	j++;
-					// }
-					// free(data)
-					// data->envp[j] = NULL;
-				}
+				len = ft_strlen(cmd->params[i]);
+				if (ft_strncmp(cmd->params[i], cmd->data->envp[j], len) == 0
+					&& (cmd->data->envp[j][len] == '=' || cmd->data->envp[j][len] == '\0'))
+					remove_from_envp(cmd->data, j);
 			}
 		}
 	}

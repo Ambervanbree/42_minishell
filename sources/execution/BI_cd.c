@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 10:17:40 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/18 12:11:10 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/19 16:15:31 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,13 @@ void	one_dir_up(char **path)
 	temp = NULL;
 }
 
-void	handle_dots(t_data *data)
+void	handle_dots(t_cmd *cmd)
 {
 	char	**dir_tab;
 	char	*path;
 	int		i;
 
-	dir_tab = ft_split(data->params[1], '/');
+	dir_tab = ft_split(cmd->params[1], '/');
 	//dirtab needs to be freed
 	i = 0;
 	path = getcwd(NULL, 0);
@@ -102,21 +102,21 @@ void	find_home_cd(t_data *data)
 	temp = NULL;
 }
 
-void	ft_cd(t_data *data)
+void	ft_cd(t_cmd *cmd)
 {
 	char	*oldpwd;
 	char	*pwd;
 	
 	oldpwd = getcwd(NULL, 0);
-	if (data->params[1] == NULL)
-		find_home_cd(data);
-	else if (data->params[1][0] == '/')
+	if (cmd->params[1] == NULL)
+		find_home_cd(cmd->data);
+	else if (cmd->params[1][0] == '/')
 	{
-		if (chdir(data->params[1]) == -1)
+		if (chdir(cmd->params[1]) == -1)
 			perror("error - cd");
 	}
 	else
-		handle_dots(data);
+		handle_dots(cmd);
 	pwd = getcwd(NULL, 0);
-	finish_cd(data, pwd, oldpwd);
+	finish_cd(cmd->data, pwd, oldpwd);
 }
