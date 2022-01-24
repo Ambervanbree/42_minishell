@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:32:53 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/19 17:17:53 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/24 13:22:08 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	exec_nonbuiltins(t_cmd *cmd)
 {
-	if (execve(cmd->params[0], cmd->params, cmd->data->envp) == -1)
+	if (execve(cmd->params[0], cmd->params, NULL) == -1)
 	{
 		//some kind of free function
 		perror("error - execution fail");
@@ -37,8 +37,8 @@ int	fork_function(t_cmd *cmd)
 			return (-1);
 		if (exec_builtins(cmd) == 1)
 			return (1);
-		else if (exec_nonbuiltins(cmd) == 1)
-			return (2);
+		// else if (exec_nonbuiltins(cmd) == 1)
+		// 	return (2);
 	}
 	else
 		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
@@ -47,43 +47,39 @@ int	fork_function(t_cmd *cmd)
 
 void	free_envp(t_data *data)
 {
-	int	i;
-
-	i = -1;
-	while (data->envp[++i])
+	while (data->envp->next)
 	{
-		if (data->envp[i] != NULL)
-		{
-			printf("free (infunct) %p\n", data->envp[i]);
-			free(data->envp[i]);
-			data->envp[i] = NULL;
-		}
+		free(data->envp->name);
+		free(data->envp->var);
+		data->envp->name = NULL;
+		data->envp->var = NULL;
 	}
-	if (data->envp != NULL)
+	if (data->envp)
 	{
-		printf("free (infunct) %p\n", data->envp);
 		free(data->envp);
 		data->envp = NULL;
 	}
+	// int	i;
+
+	// i = -1;
+	// while (data->envp[++i])
+	// {
+	// 	if (data->envp[i] != NULL)
+	// 	{
+	// 		printf("free (infunct) %p\n", data->envp[i]);
+	// 		free(data->envp[i]);
+	// 		data->envp[i] = NULL;
+	// 	}
+	// }
+	// if (data->envp != NULL)
+	// {
+	// 	printf("free (infunct) %p\n", data->envp);
+	// 	free(data->envp);
+	// 	data->envp = NULL;
+	// }
 }
 
-int	init_envp(t_data *data, char *envp[])
-{
-	int	i;
-
-	i = 0;
-	while (envp[i])
-		i++;
-	data->envp = ft_calloc(i + 1, sizeof(char *));
-	if (data->envp == NULL)
-		return (-1);
-	i = -1;
-	while (envp[++i])
-		data->envp[i] = ft_strdup(envp[i]);
-	return (1);
-}
-
-void	init_commands(t_data *data, char *command_in)
+int	init_commands(t_data *data, char *command_in)
 {
 	int		i;
 	char	**commands;
@@ -96,7 +92,10 @@ void	init_commands(t_data *data, char *command_in)
 	data->nr_pipes = i - 1;
 	data->cmd = malloc(sizeof(t_cmd) * data->nr_cmds);
 	if (!data->cmd)
-		printf("Aaaaaahhhhh\n");
+	{
+		perror("malloc failed");
+		return (0);
+	}
 	i = -1;
 	while (++i < data->nr_cmds)
 	{
@@ -106,6 +105,7 @@ void	init_commands(t_data *data, char *command_in)
 		data->cmd[i].id = i;
 		data->cmd[i].data = data;
 	}
+	return (1);
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -130,17 +130,15 @@ int	main(int argc, char *argv[], char *envp[])
 		{
 			// lexer + parser
 			init_commands(&data, command_in);
-			i = -1;
-			// while (++i < data.nr_cmds)
-			// 	ft_printf("%s\n", data.cmd[i].params[0]);
+			// not sure to protect with if -1, exit
 			i = -1;
 			while (++i < data.nr_cmds)
 			{
 				if (exec_prefork_builtins(&data.cmd[i])	== 0)
 					fork_function(&data.cmd[i]);
+				// not sure to protect with if -1, exit
 			}
 		}
-		//return is -1 on error, but not sure what to do with it
 		free(command_in);
 		command_in = NULL;
 		ft_printf("Our_minishell%% ");

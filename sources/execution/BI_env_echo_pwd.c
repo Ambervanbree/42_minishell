@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 17:18:03 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/19 17:16:53 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/24 13:23:10 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,12 @@ void	ft_echo(t_cmd *cmd)
 
 void	ft_env(t_cmd *cmd)
 {	
-	int	i;
-	int	j;
-
-	i = -1;
-	j = 0;
-	while (cmd->data->envp[++i])
+	while (cmd->data->envp->next)
 	{
-		if (cmd->data->envp[i][0] == '_' && cmd->data->envp[i][1] == '=')
-			j = i;
-		else
-		{
-			if (ft_strrchr(cmd->data->envp[i], '='))
-				ft_printf("%s\n", cmd->data->envp[i]);
-		}
+		if (cmd->data->envp->var
+			&& ft_strncmp("_\0", cmd->data->envp->name, 2) != 0)
+			ft_printf("%s=%s\n", cmd->data->envp->name, cmd->data->envp->var);
+		cmd->data->envp = cmd->data->envp->next;
 	}
 	ft_printf("_=/bin/env\n");
 	exit (0);

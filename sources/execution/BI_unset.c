@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 14:07:45 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/19 16:17:04 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/24 17:09:44 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,47 +34,73 @@ int		check_identifier_unset(char *id)
 	return (1);
 }
 
-void	remove_from_envp(t_data *data, int index)
+t_envp	*remove_from_envp(t_envp *envp, char *name)
 {
-	char	**temp;
-	int		i;
-	int		j;
+	t_envp	*temp;
+	t_envp	*temp2;
 
-	i = 0;
-	while (data->envp[i])
-		i++;
-	temp = data->envp;
-	data->envp = ft_calloc(i, sizeof(char *));
-	j = -1;
-	while (++j < index)
-		data->envp[j] = temp[j];
-	while (j < (i - 1))
+	temp2 = envp;
+	while (envp)
 	{
-		data->envp[j] = temp[j + 1];
-		j++;
+		if (ft_strncmp(envp->name, name, ft_strlen(envp->name) + 1))
+		{
+			temp = envp;
+			envp = envp->next;
+			free (temp);
+			temp = NULL;
+			break ;
+		}
+		envp = envp->next;
 	}
-	free(data->envp[j]);
-	data->envp[j] = NULL;
+	return (temp2);
+
+// 	char	**temp;
+// 	int		i;
+// 	int		j;
+
+// 	i = 0;
+// 	printf("index is: %d\n", index);
+// 	while (data->envp[i])
+// 		i++;
+// 	temp = data->envp;
+// 	data->envp = ft_calloc(i, sizeof(char *));
+// 	j = -1;
+// 	while (++j < index)
+// 	{
+// 		data->envp[j] = temp[j];
+// 		printf("copied: %d: %s\n", j, data->envp[j]);
+// 	}
+// 	while (j < (i - 1))
+// 	{
+// 		data->envp[j] = temp[j + 1];
+// 		printf("alter copied: %d, %s\n", j, data->envp[j]);
+// 		j++;
+// 	}
+// 	printf("to delete: %d, %s\n", j, data->envp[j]);
+// //	exit (0);
+// 	free(temp[j + 1]);
+// 	temp[j] = NULL;
 }
 
 void	ft_unset(t_cmd *cmd)
 {
 	int		i;
-	int		j;
-	int		len;
-
+	t_envp	*temp;
+	
+	temp = cmd->data->envp;
 	i = 0;
 	while (cmd->params[++i])
 	{
 		if (check_identifier_unset(cmd->params[i]))
 		{
-			j = -1;
-			while (cmd->data->envp[++j])
+			while (temp)
 			{
-				len = ft_strlen(cmd->params[i]);
-				if (ft_strncmp(cmd->params[i], cmd->data->envp[j], len) == 0
-					&& (cmd->data->envp[j][len] == '=' || cmd->data->envp[j][len] == '\0'))
-					remove_from_envp(cmd->data, j);
+				if (ft_strncmp(temp->name, cmd->params[i], ft_strlen(temp->name)) == 0)
+				{
+					cmd->data->envp = remove_from_envp(cmd->data->envp, temp->name);
+					return ;
+				}
+				temp = temp->next;
 			}
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 10:17:40 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/19 16:15:31 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/24 13:06:35 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,40 +66,37 @@ void	handle_dots(t_cmd *cmd)
 		perror("error - cd");
 }
 
-void	finish_cd(t_data *data, char *pwd, char *oldpwd)
-{
-	size_t	i;
+// void	finish_cd(t_data *data, char *pwd, char *oldpwd)
+// {
+// 	size_t	i;
 
-	i = ft_strlen(pwd);
-	if (ft_strlen(oldpwd) > i)
-		i = ft_strlen(oldpwd);
-	if (ft_strncmp(pwd, oldpwd, i) != 0)
-	{
-		oldpwd = ft_strjoin("OLDPWD=", oldpwd);
-		add_to_envp(data, oldpwd);
-		pwd = ft_strjoin("PWD=", pwd);
-		add_to_envp(data, pwd);
-	}
-}
+// 	i = ft_strlen(pwd);
+// 	if (ft_strlen(oldpwd) > i)
+// 		i = ft_strlen(oldpwd);
+// 	if (ft_strncmp(pwd, oldpwd, i) != 0)
+// 	{
+// 		oldpwd = ft_strjoin("OLDPWD=", oldpwd);
+// 		add_to_envp(data, oldpwd);
+// 		pwd = ft_strjoin("PWD=", pwd);
+// 		add_to_envp(data, pwd);
+// 	}
+// }
 
 void	find_home_cd(t_data *data)
 {
 	int		i;
-	char	*temp;
 
 	i = -1;
-	temp = NULL;
-	while (data->envp[++i])
+	while (data->envp->next)
 	{
-		if (ft_strncmp("HOME=", data->envp[i], 5) == 0)
+		if (ft_strncmp("HOME\0", data->envp->name, 5) == 0
+			&& data->envp->var != NULL)
 		{
-			temp = ft_substr(data->envp[i], 5, ft_strlen(data->envp[i]));
-			if (chdir(temp) == -1)
+			if (chdir(data->envp->var) == -1)
 				perror("error - cd");
 		}
+		data->envp = data->envp->next;
 	}
-	free(temp);
-	temp = NULL;
 }
 
 void	ft_cd(t_cmd *cmd)
@@ -118,5 +115,5 @@ void	ft_cd(t_cmd *cmd)
 	else
 		handle_dots(cmd);
 	pwd = getcwd(NULL, 0);
-	finish_cd(cmd->data, pwd, oldpwd);
+//	finish_cd(cmd->data, pwd, oldpwd);
 }

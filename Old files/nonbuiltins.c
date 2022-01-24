@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 12:30:26 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/17 09:56:52 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/24 12:38:44 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@
 
 int	execute_nonBIs(t_data *data)
 {
-	if (execve(data->params[0], data->params, data->envp) == -1)
+	if (execve(data->params[0], data->params, NULL) == -1)
 	{
 		//some kind of free function
 		perror("error - execution fail");
