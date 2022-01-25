@@ -21,6 +21,7 @@ int	exec_builtins(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->params[0], "pwd\0", 4) == 0)
 	{
+		free_data(cmd);
 		ft_pwd();
 		return (1);
 	}

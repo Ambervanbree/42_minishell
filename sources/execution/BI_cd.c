@@ -12,90 +12,42 @@
 
 #include "minishell.h"
 
-void	add_dir(char **path, char *dir)
+void	finish_cd(t_data *data, char *pwd, char *oldpwd)
 {
-	char	*temp;
+	size_t	i;
 
-	temp = *path;
-	*path = ft_strjoin(*path, "/");
-	*path = ft_strjoin(*path, dir);
-	free(temp);
-	temp = NULL;
-}
-
-void	one_dir_up(char **path)
-{
-	int		i;
-	char	*temp;
-
-	temp = *path;
-	i = ft_strlen(*path);
-	while (i && (*path)[i] != '/')
-		i--;
-	*path = ft_substr(*path, 0, i);
-	free(temp);
-	temp = NULL;
-}
-
-void	handle_dots(t_cmd *cmd)
-{
-	char	**dir_tab;
-	char	*path;
-	int		i;
-
-	dir_tab = ft_split(cmd->params[1], '/');
-	//dirtab needs to be freed
-	i = 0;
-	path = getcwd(NULL, 0);
-	while (dir_tab[i])
+	i = ft_strlen(pwd);
+	if (ft_strlen(oldpwd) > i)
+		i = ft_strlen(oldpwd);
+	if (ft_strncmp(pwd, oldpwd, i) != 0)
 	{
-		if (ft_strncmp(dir_tab[i], ".\0", ft_strlen(dir_tab[i]) + 1) == 0)
-			i++;
-		else if (ft_strncmp(dir_tab[i], "..\0", ft_strlen(dir_tab[i]) + 1) == 0)
-		{
-			one_dir_up(&path);
-			i++;
-		}
-		else
-		{
-			add_dir(&path, dir_tab[i]);
-			i++;
-		}
+		oldpwd = ft_strjoin("OLDPWD=", oldpwd);
+		add_to_envp(data->envp, oldpwd);
+		pwd = ft_strjoin("PWD=", pwd);
+		add_to_envp(data->envp, pwd);
 	}
-	if (chdir(path) == -1)
-		perror("error - cd");
+	free(oldpwd);
+	free(pwd);
+	oldpwd = NULL;
+	pwd = NULL;
 }
-
-// void	finish_cd(t_data *data, char *pwd, char *oldpwd)
-// {
-// 	size_t	i;
-
-// 	i = ft_strlen(pwd);
-// 	if (ft_strlen(oldpwd) > i)
-// 		i = ft_strlen(oldpwd);
-// 	if (ft_strncmp(pwd, oldpwd, i) != 0)
-// 	{
-// 		oldpwd = ft_strjoin("OLDPWD=", oldpwd);
-// 		add_to_envp(data, oldpwd);
-// 		pwd = ft_strjoin("PWD=", pwd);
-// 		add_to_envp(data, pwd);
-// 	}
-// }
 
 void	find_home_cd(t_data *data)
 {
 	int		i;
+	t_envp	*temp;
 
 	i = -1;
-	while (data->envp->next)
+	temp = data->envp;
+	while (temp)
 	{
-		if (ft_strncmp("HOME\0", data->envp->name, 5) == 0
-			&& data->envp->var != NULL)
+		if (ft_strncmp("HOME\0", temp->name, 5) == 0
+			&& temp->var != NULL)
 		{
-			if (chdir(data->envp->var) == -1)
+			if (chdir(temp->var) == -1)
 				perror("error - cd");
 		}
-		data->envp = data->envp->next;
+		temp = temp->next;
 	}
 }
 
@@ -115,5 +67,5 @@ void	ft_cd(t_cmd *cmd)
 	else
 		handle_dots(cmd);
 	pwd = getcwd(NULL, 0);
-//	finish_cd(cmd->data, pwd, oldpwd);
+	finish_cd(cmd->data, pwd, oldpwd);
 }

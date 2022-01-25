@@ -45,40 +45,6 @@ int	fork_function(t_cmd *cmd)
 	return (1);
 }
 
-void	free_envp(t_data *data)
-{
-	while (data->envp->next)
-	{
-		free(data->envp->name);
-		free(data->envp->var);
-		data->envp->name = NULL;
-		data->envp->var = NULL;
-	}
-	if (data->envp)
-	{
-		free(data->envp);
-		data->envp = NULL;
-	}
-	// int	i;
-
-	// i = -1;
-	// while (data->envp[++i])
-	// {
-	// 	if (data->envp[i] != NULL)
-	// 	{
-	// 		printf("free (infunct) %p\n", data->envp[i]);
-	// 		free(data->envp[i]);
-	// 		data->envp[i] = NULL;
-	// 	}
-	// }
-	// if (data->envp != NULL)
-	// {
-	// 	printf("free (infunct) %p\n", data->envp);
-	// 	free(data->envp);
-	// 	data->envp = NULL;
-	// }
-}
-
 int	init_commands(t_data *data, char *command_in)
 {
 	int		i;

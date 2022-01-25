@@ -30,7 +30,7 @@ SRCS	=	ft_memset.c ft_bzero.c ft_memcpy.c ft_memccpy.c ft_memmove.c \
 			ft_lstnew.c ft_lstadd_front.c in_set.c get_next_line.c \
 			get_next_line_utils.c \
 
-PSRCS	=	ft_printf.c ft_printf_utils.c print_char.c print_hex.c print_int.c \
+PSRCS	=	ft_printf.c print_char.c print_hex.c print_int.c \
 			print_hex_cap.c print_ptr.c print_string.c print_uns_int.c
 	
 BONUS	=	ft_lstsize.c ft_lstlast.c ft_lstadd_back.c ft_lstdelone.c \

@@ -31,36 +31,41 @@ void	add_to_envp(t_envp *envp, char *var)
 {
 	t_envp	*new;
 	t_envp	*temp;
-	t_envp	*temp2;
 	
 	temp = envp;
 	new = new_item(var);
-	while (temp->next->next)
+	while (envp)
 	{
-		if (ft_strncmp(temp->next->name, new->name, ft_strlen(new->name) + 1) == 0)
+		if (ft_strncmp(envp->name, new->name, ft_strlen(envp->name) + 1) == 0)
 		{
 			if (new->var)
 			{
-				new->next = temp->next->next;
-				temp2 = temp->next;
-				temp->next = new;
-				free(temp2);
-				temp2 = NULL;
+				new->next = envp->next;
+				new->previous = envp->previous;
+				envp->previous->next = new;
+				if (envp->next)
+					envp->next->previous = new;
+				free(envp);
+				envp = NULL;
 			}
 			return ;
-		}
-		temp = temp->next;
+		}	
+		envp = envp->next;
 	}
 	add_item_back(&temp, new);
 }
 
-int	check_identifier_export(char *id)
+int	check_identifier(char *id, int code)
 {
 	int	i;
 
-	if (ft_isdigit(id[0]) || id == '\0')
+	if (ft_isdigit(id[0]) || id[0] == '\0')
 	{
-		ft_printf("%s: '%s': %s\n", "export",
+		if (code == 3)
+			ft_printf("%s: '%s': %s\n", "export",
+			id, "not a valid identifier");
+		if (code == 4)
+			ft_printf("%s: '%s': %s\n", "unset",
 			id, "not a valid identifier");
 		return (0);
 	}
@@ -69,9 +74,12 @@ int	check_identifier_export(char *id)
 	{
 		if (!(ft_isalnum(id[i]) || (id[i] == '_')))
 		{
-			ft_printf("%s: '%s': %s\n", "export",
+			if (code == 3)
+				ft_printf("%s: '%s': %s\n", "export",
 				id, "not a valid identifier");
-			//should make ft_printf_fd here maybe to print on stderr
+			if (code == 4)
+				ft_printf("%s: '%s': %s\n", "unset",
+				id, "not a valid identifier");
 			return (0);
 		}
 	}
@@ -82,7 +90,6 @@ void	ft_export(t_cmd *cmd)
 {
 	int		i;
 
-	i = -1;
 	if (cmd->params[1] == NULL)
 	{
 		print_exported_variables(cmd->data->envp);
@@ -93,7 +100,7 @@ void	ft_export(t_cmd *cmd)
 		i = 0;
 		while (cmd->params[++i])
 		{
-			if (check_identifier_export(cmd->params[i]))
+			if (check_identifier(cmd->params[i], EXPORT))
 				add_to_envp(cmd->data->envp, cmd->params[i]);
 		}
 	}

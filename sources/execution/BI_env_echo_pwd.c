@@ -52,12 +52,13 @@ void	ft_echo(t_cmd *cmd)
 		ft_printf("%s", cmd->params[i]);
 	else
 		ft_printf("%s\n", cmd->params[i]);
+	free_data(cmd);
 	exit(0);
 }
 
 void	ft_env(t_cmd *cmd)
-{	
-	while (cmd->data->envp->next)
+{
+	while (cmd->data->envp)
 	{
 		if (cmd->data->envp->var
 			&& ft_strncmp("_\0", cmd->data->envp->name, 2) != 0)
@@ -65,5 +66,6 @@ void	ft_env(t_cmd *cmd)
 		cmd->data->envp = cmd->data->envp->next;
 	}
 	ft_printf("_=/bin/env\n");
+	free_data(cmd);
 	exit (0);
 }

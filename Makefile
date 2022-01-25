@@ -21,7 +21,7 @@ RM		=	@rm -rf
 CC		=	@clang
 IFLAGS	=	-I. -Ilibft
 RLFLAGS	=	-lreadline
-SFLAGS	=	-fsanitize=address -g3 
+SFLAGS	=	#-fsanitize=address -g3 
 CFLAGS	:=	-Wall -Werror -Wextra $(IFLAGS) 
 LFLAGS	:=	-Llibft -lft
 
@@ -30,8 +30,8 @@ LFLAGS	:=	-Llibft -lft
 ################################################################################
 
 SRCS	=	minishell.c environment.c $(addprefix $(E_DIR), $(E_SRCS))
-E_SRCS	=	redirection.c builtins.c BI_cd.c BI_env_echo_pwd.c BI_export.c \
-			BI_unset.c
+E_SRCS	=	redirection.c builtins.c BI_cd.c BI_cd2.c BI_env_echo_pwd.c \
+			BI_export.c BI_unset.c
 B_SRCS	=	
 S_DIR	=	sources/
 B_DIR	=	bonus_sources/
