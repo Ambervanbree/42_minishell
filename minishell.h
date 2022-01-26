@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:33:03 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 17:04:29 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 11:07:17 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ enum	BI
 	EXPORT,
 	UNSET,
 	ENV,
-	EXIT
+//	EXIT
 };
 
 struct	s_cmd;
@@ -79,6 +79,7 @@ void	remove_from_envp(t_envp *envp, char *name);
 void	ft_unset(t_cmd *cmd);
 void	ft_pwd(void);
 void	ft_cd(t_cmd *cmd);
+void	ft_exit(t_cmd *cmd);
 int		redirect_or_pipe(t_cmd *cmd);
 void	close_all_except_two(t_data *data, int pipe);
 void	close_all_except(t_data *data, int pipe, int index);
@@ -86,7 +87,7 @@ int		init_envp(t_data *data, char *envp[]);
 t_envp	*new_item(char *string);
 void	add_item_back(t_envp **list, t_envp *new);
 int		check_identifier(char *id, int code);
-void	free_data(t_cmd *cmd);
+void	free_envp(t_cmd *cmd);
 void	handle_dots(t_cmd *cmd);
 
 #endif

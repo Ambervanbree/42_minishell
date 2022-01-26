@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 11:19:50 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 16:33:19 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 11:02:33 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	exec_builtins(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->params[0], "pwd\0", 4) == 0)
 	{
-		free_data(cmd);
+		free_envp(cmd);
 		ft_pwd();
 		return (1);
 	}
@@ -91,6 +91,8 @@ int	exec_prefork_builtins(t_cmd *cmd)
 		funct = EXPORT;
 	else if (ft_strncmp(cmd->params[0], "unset\0", 6) == 0)
 		funct = UNSET;
+	else if (ft_strncmp(cmd->params[0], "exit\0", 5) == 0)
+		ft_exit(cmd);
 	if (funct)
 	{
 		if (exec_prefork_builtins2(cmd, funct) == -1)

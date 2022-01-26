@@ -80,9 +80,13 @@ int	main(int argc, char *argv[], char *envp[])
 	t_data	data;
 	int		i;
 
-	argc = 0;
 	init_envp(&data, envp);
 	// not sure to protect with if -1, exit
+	if (argc > 1)
+	{
+		ft_printf("Expected usage: ./minishell");
+		exit (127);
+	}
 	argv = NULL;
 	ft_printf("Our_minishell%% ");
 	command_in = get_next_line(STDIN_FILENO);
