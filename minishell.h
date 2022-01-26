@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:33:03 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/26 11:07:17 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 15:33:58 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct	s_envp
 {
 	char			*name;
 	char			*var;
+	int				printed;
 	struct s_envp	*next;
 	struct s_envp	*previous;
 }	t_envp;
@@ -89,5 +90,6 @@ void	add_item_back(t_envp **list, t_envp *new);
 int		check_identifier(char *id, int code);
 void	free_envp(t_cmd *cmd);
 void	handle_dots(t_cmd *cmd);
+int		size_list(t_envp *head);
 
 #endif

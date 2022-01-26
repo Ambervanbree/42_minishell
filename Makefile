@@ -6,7 +6,7 @@
 #    By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/14 15:32:57 by avan-bre          #+#    #+#              #
-#    Updated: 2022/01/26 11:07:44 by avan-bre         ###   ########.fr        #
+#    Updated: 2022/01/26 17:23:23 by avan-bre         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,9 +29,9 @@ LFLAGS	:=	-Llibft -lft
 #                                    FILES                                     #
 ################################################################################
 
-SRCS	=	minishell.c environment.c $(addprefix $(E_DIR), $(E_SRCS))
+SRCS	=	minishell.c set_envp.c envp_utils.c $(addprefix $(E_DIR), $(E_SRCS))
 E_SRCS	=	redirection.c builtins.c BI_cd.c BI_cd2.c BI_env_echo_pwd.c \
-			BI_export.c BI_unset.c BI_exit.c
+			BI_export.c BI_export2.c BI_unset.c BI_exit.c
 B_SRCS	=	
 S_DIR	=	sources/
 B_DIR	=	bonus_sources/

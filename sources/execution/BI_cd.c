@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 10:17:40 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 13:06:35 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 17:44:21 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	finish_cd(t_data *data, char *pwd, char *oldpwd)
 	pwd = NULL;
 }
 
-void	find_home_cd(t_data *data)
+void	chdir_var(t_data *data, char *var)
 {
 	int		i;
 	t_envp	*temp;
@@ -41,24 +41,27 @@ void	find_home_cd(t_data *data)
 	temp = data->envp;
 	while (temp)
 	{
-		if (ft_strncmp("HOME\0", temp->name, 5) == 0
-			&& temp->var != NULL)
+		if (ft_strncmp(var, temp->name, 5) == 0 && temp->var != NULL)
 		{
 			if (chdir(temp->var) == -1)
 				perror("error - cd");
+			return ;
 		}
 		temp = temp->next;
 	}
+	ft_printf("%s%s%s\n", "cd: ", var, " not set");
 }
 
 void	ft_cd(t_cmd *cmd)
 {
 	char	*oldpwd;
 	char	*pwd;
-	
+
 	oldpwd = getcwd(NULL, 0);
 	if (cmd->params[1] == NULL)
-		find_home_cd(cmd->data);
+		chdir_var(cmd->data, "HOME");
+	else if (cmd->params[1][0] == '-' && cmd->params[1][1] == '\0')
+		chdir_var(cmd->data, "OLDPWD");
 	else if (cmd->params[1][0] == '/')
 	{
 		if (chdir(cmd->params[1]) == -1)

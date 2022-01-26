@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 17:18:03 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 13:23:10 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 17:04:49 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,20 @@ void	ft_echo(t_cmd *cmd)
 
 void	ft_env(t_cmd *cmd)
 {
-	while (cmd->data->envp)
+	if (cmd->params[1] != NULL)
+		ft_printf("env: too many arguments\n");
+	else
 	{
-		if (cmd->data->envp->var
-			&& ft_strncmp("_\0", cmd->data->envp->name, 2) != 0)
-			ft_printf("%s=%s\n", cmd->data->envp->name, cmd->data->envp->var);
-		cmd->data->envp = cmd->data->envp->next;
+		while (cmd->data->envp)
+		{
+			if (cmd->data->envp->var
+				&& ft_strncmp("_\0", cmd->data->envp->name, 2) != 0)
+				ft_printf("%s=%s\n", cmd->data->envp->name,
+					cmd->data->envp->var);
+			cmd->data->envp = cmd->data->envp->next;
+		}
+		ft_printf("_=/bin/env\n");
 	}
-	ft_printf("_=/bin/env\n");
 	free_envp(cmd);
 	exit (0);
 }

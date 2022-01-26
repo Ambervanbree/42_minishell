@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:32:53 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 13:22:08 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 16:52:59 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ int	main(int argc, char *argv[], char *envp[])
 			i = -1;
 			while (++i < data.nr_cmds)
 			{
-				if (exec_prefork_builtins(&data.cmd[i])	== 0)
+				if (exec_prefork_builtins(&data.cmd[i]) == 0)
 					fork_function(&data.cmd[i]);
 				// not sure to protect with if -1, exit
 			}

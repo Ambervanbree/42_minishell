@@ -6,84 +6,85 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 16:43:49 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 17:24:06 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 17:22:17 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_exported_variables(t_envp *envp)
+void	reset_printed(t_envp *envp)
 {
 	t_envp	*temp;
 
 	temp = envp;
 	while (temp)
 	{
-		if (temp->var)
-			ft_printf("%s %s=\"%s\"\n", "declare -x", temp->name, temp->var);
-		else
-			ft_printf("%s %s\n", "declare -x", temp->name);
+		temp->printed = 0;
 		temp = temp->next;
 	}
 }
 
-void	add_to_envp(t_envp *envp, char *var)
+int	smaller_ascii(char *str1, char *str2)
 {
-	t_envp	*new;
-	t_envp	*temp;
-	
-	temp = envp;
-	new = new_item(var);
-	while (envp)
-	{
-		if (ft_strncmp(envp->name, new->name, ft_strlen(envp->name) + 1) == 0)
-		{
-			if (new->var)
-			{
-				new->next = envp->next;
-				new->previous = envp->previous;
-				envp->previous->next = new;
-				if (envp->next)
-					envp->next->previous = new;
-				free(envp);
-				envp = NULL;
-			}
-			return ;
-		}	
-		envp = envp->next;
-	}
-	add_item_back(&temp, new);
-}
+	size_t	i;
+	size_t	size;
 
-int	check_identifier(char *id, int code)
-{
-	int	i;
-
-	if (ft_isdigit(id[0]) || id[0] == '\0')
-	{
-		if (code == 3)
-			ft_printf("%s: '%s': %s\n", "export",
-			id, "not a valid identifier");
-		if (code == 4)
-			ft_printf("%s: '%s': %s\n", "unset",
-			id, "not a valid identifier");
-		return (0);
-	}
+	i = 0;
+	size = ft_strlen(str1);
+	if (ft_strlen(str2) < size)
+		size = ft_strlen(str2);
 	i = -1;
-	while (id[++i] != '=' && id[i] != '\0')
+	while (++i < size)
 	{
-		if (!(ft_isalnum(id[i]) || (id[i] == '_')))
-		{
-			if (code == 3)
-				ft_printf("%s: '%s': %s\n", "export",
-				id, "not a valid identifier");
-			if (code == 4)
-				ft_printf("%s: '%s': %s\n", "unset",
-				id, "not a valid identifier");
+		if (str1[i] < str2[i])
+			return (1);
+		if (str1[i] > str2[i])
 			return (0);
-		}
 	}
 	return (1);
+}
+
+t_envp	*get_smallest_unprinted(t_envp *envp, int size)
+{
+	t_envp	*temp;
+	t_envp	*min;
+	int		i;
+
+	temp = envp;
+	while (temp->printed)
+		temp = temp->next;
+	min = temp;
+	temp = envp;
+	i = -1;
+	while (++i < size)
+	{
+		if (temp->printed == 0 && smaller_ascii(temp->name, min->name))
+			min = temp;
+		temp = temp->next;
+	}
+	return (min);
+}
+
+void	print_exported_variables(t_envp *envp)
+{
+	t_envp	*temp;
+	t_envp	*min;
+	int		size;
+	int		i;
+
+	size = size_list(envp);
+	temp = envp;
+	i = -1;
+	while (++i < size)
+	{
+		min = get_smallest_unprinted(envp, size);
+		if (min->var)
+			ft_printf("%s %s=\"%s\"\n", "declare -x", min->name, min->var);
+		else
+			ft_printf("%s %s\n", "declare -x", min->name);
+		min->printed++;
+	}
+	reset_printed(envp);
 }
 
 void	ft_export(t_cmd *cmd)

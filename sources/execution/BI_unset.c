@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 14:07:45 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/24 17:09:44 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 17:26:29 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	ft_unset(t_cmd *cmd)
 {
 	int		i;
 	t_envp	*temp;
-	
+
 	temp = cmd->data->envp;
 	i = 0;
 	while (cmd->params[++i])
@@ -40,7 +40,8 @@ void	ft_unset(t_cmd *cmd)
 		{
 			while (temp)
 			{
-				if (ft_strncmp(temp->name, cmd->params[i], ft_strlen(temp->name)) == 0)
+				if (ft_strncmp(temp->name, cmd->params[i],
+						ft_strlen(temp->name)) == 0)
 				{
 					remove_from_envp(cmd->data->envp, temp->name);
 					return ;

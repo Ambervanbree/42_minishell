@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 11:19:50 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/26 11:02:33 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/26 17:27:04 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,6 @@ int	exec_builtins(t_cmd *cmd)
 		ft_env(cmd);
 		return (1);
 	}
-// 	else if (ft_strncmp(data->params[0], "exit\0", 5) == 0)
-// 	{
-// 		ft_exit(data);
-// 		return (1);
-// 	}
 	return (0);
 }
 
