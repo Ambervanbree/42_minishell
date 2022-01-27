@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/27 10:03:37 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/27 15:33:59 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/27 15:42:36 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,18 +68,16 @@ int	pipe_function(t_cmd *cmd)
 {
 	if (cmd->id == 0)
 	{
-//		printf("%s close all except %d, %d\n", cmd->params[0], 0, 1);
 		close_all_except(cmd->data, 0, 1, cmd->params[0]);
-		//if (cmd->o_file[0] == NULL)
-		dup2(cmd->data->pipe_fd[0][1], STDOUT_FILENO);
+		if (cmd->o_file[0] == NULL)
+			dup2(cmd->data->pipe_fd[0][1], STDOUT_FILENO);
 		close(cmd->data->pipe_fd[0][1]);
 	}
 	else if (cmd->id == (cmd->data->nr_cmds - 1))
 	{
-//		printf("%s close all except %d, %d\n", cmd->params[0], cmd->id - 1, 0);
 		close_all_except(cmd->data, cmd->id - 1, 0, cmd->params[0]);
-		//if (cmd->i_file[0] == NULL)
-		dup2(cmd->data->pipe_fd[cmd->id - 1][0], STDIN_FILENO);
+		if (cmd->i_file[0] == NULL)
+			dup2(cmd->data->pipe_fd[cmd->id - 1][0], STDIN_FILENO);
 		close(cmd->data->pipe_fd[cmd->id - 1][0]);
 	}
 	else
