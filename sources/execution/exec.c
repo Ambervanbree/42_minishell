@@ -1,16 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 11:19:50 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/26 17:27:04 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/27 15:18:23 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	exec_nonbuiltins(t_cmd *cmd)
+{
+	printf("executing: %s\n", cmd->params[0]);
+	if (execve(cmd->params[0], cmd->params, NULL) == -1)
+	{
+		//some kind of free function
+		perror("error - execution fail");
+		exit (1);
+	}
+	exit (0);
+}
 
 int	exec_builtins(t_cmd *cmd)
 {
@@ -33,23 +45,34 @@ int	exec_builtins(t_cmd *cmd)
 	return (0);
 }
 
-void	reverse_redirection(t_cmd *cmd, int in, int out)
+int	fork_function(t_cmd *cmd)
 {
-	if (cmd->i_file != NULL)
-		dup2(in, STDIN_FILENO);
-	if (cmd->o_file != NULL)
-		dup2(out, STDOUT_FILENO);
-	if (cmd->id == 0 & cmd->data->nr_cmds > 1)
-		dup2(out, STDOUT_FILENO);
-	else if (cmd->id == cmd->data->nr_cmds && cmd->data->nr_cmds > 1)
-		dup2(in, STDIN_FILENO);
-	else if (cmd->data->nr_cmds > 1)
+	cmd->data->process_id[cmd->id] = fork();
+	if (cmd->data->process_id[cmd->id] == -1)
 	{
-		dup2(in, STDIN_FILENO);
-		dup2(out, STDOUT_FILENO);
+		perror("error - fork failed");
+		return (-1);
 	}
-	close(in);
-	close(out);
+	else if (cmd->data->process_id[cmd->id] == 0)
+	{
+		if (redirect_io(cmd) == 0)
+			return (-1);
+		if (cmd->data->nr_cmds > 1)
+			if (pipe_function(cmd) == 0)
+				return(-1);
+		if (exec_builtins(cmd) == 1)
+			return (1);
+		else if (exec_nonbuiltins(cmd) == 1)
+		{
+			printf("Finds: %s\n", cmd->params[0]);
+			return (2);
+		}
+		else
+			return (0);
+	}
+	else
+		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
+	return (1);
 }
 
 int	exec_prefork_builtins2(t_cmd *cmd, enum BI funct)
@@ -57,9 +80,11 @@ int	exec_prefork_builtins2(t_cmd *cmd, enum BI funct)
 	int		current_stdin;
 	int		current_stdout;
 
+	if (funct == EXIT)
+		ft_exit(cmd);
 	current_stdin = dup(STDIN_FILENO);
 	current_stdout = dup(STDOUT_FILENO);
-	if (redirect_or_pipe(cmd) == 0)
+	if (redirect_io(cmd) == 0 || pipe_function(cmd) == 0)
 	{
 		close(current_stdin);
 		close(current_stdout);
@@ -87,9 +112,11 @@ int	exec_prefork_builtins(t_cmd *cmd)
 	else if (ft_strncmp(cmd->params[0], "unset\0", 6) == 0)
 		funct = UNSET;
 	else if (ft_strncmp(cmd->params[0], "exit\0", 5) == 0)
-		ft_exit(cmd);
+		funct = EXIT;
 	if (funct)
 	{
+		if (cmd->data->nr_cmds > 1)
+			return (1);
 		if (exec_prefork_builtins2(cmd, funct) == -1)
 			return (-1);
 		return (1);

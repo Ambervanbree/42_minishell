@@ -6,7 +6,7 @@
 #    By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/14 15:32:57 by avan-bre          #+#    #+#              #
-#    Updated: 2022/01/26 17:23:23 by avan-bre         ###   ########.fr        #
+#    Updated: 2022/01/27 10:13:18 by avan-bre         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,15 +30,15 @@ LFLAGS	:=	-Llibft -lft
 ################################################################################
 
 SRCS	=	minishell.c set_envp.c envp_utils.c $(addprefix $(E_DIR), $(E_SRCS))
-E_SRCS	=	redirection.c builtins.c BI_cd.c BI_cd2.c BI_env_echo_pwd.c \
+E_SRCS	=	redirection.c pipes.c exec.c BI_cd.c BI_cd2.c BI_env_echo_pwd.c \
 			BI_export.c BI_export2.c BI_unset.c BI_exit.c
-B_SRCS	=	
+#B_SRCS	=	
 S_DIR	=	sources/
-B_DIR	=	bonus_sources/
+#B_DIR	=	bonus_sources/
 E_DIR	=	execution/
 OBJS	=	$(addprefix $(S_DIR), $(SRCS:.c=.o))
 E_OBJS	=	$(addprefix $(E_DIR), $(B_SRCS:.c=.o))
-B_OBJS	=	$(addprefix $(B_DIR), $(B_SRCS:.c=.o))
+#B_OBJS	=	$(addprefix $(B_DIR), $(B_SRCS:.c=.o))
 
 ################################################################################
 #                                 RULES                                        #
