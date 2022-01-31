@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 11:19:50 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/27 15:18:23 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 13:55:25 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	exec_nonbuiltins(t_cmd *cmd)
 {
-	printf("executing: %s\n", cmd->params[0]);
 	if (execve(cmd->params[0], cmd->params, NULL) == -1)
 	{
 		//some kind of free function
@@ -63,16 +62,23 @@ int	fork_function(t_cmd *cmd)
 		if (exec_builtins(cmd) == 1)
 			return (1);
 		else if (exec_nonbuiltins(cmd) == 1)
-		{
-			printf("Finds: %s\n", cmd->params[0]);
 			return (2);
-		}
 		else
 			return (0);
 	}
-	else
-		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
-	return (1);
+	return (0);
+	// else
+	// {
+	// 	if (cmd->data->nr_cmds > 1)
+	// 	{
+	// 		close(cmd->data->pipe[0]);
+	// 		close(cmd->data->pipe[1]);
+	// 	}
+	// 	i = -1;
+	// 	while (++i < cmd->data->nr_cmds)
+	// 		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
+	// }
+	// return (1);
 }
 
 int	exec_prefork_builtins2(t_cmd *cmd, enum BI funct)

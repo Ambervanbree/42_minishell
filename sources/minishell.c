@@ -6,11 +6,22 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:32:53 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/27 13:28:01 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 13:50:30 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	finish_up(t_data *data)
+{
+	int	i;
+
+	if (data->nr_cmds > 1)
+		close_all_except_two(data, -1);
+	i = -1;
+	while (++i < data->nr_cmds)
+		waitpid(data->process_id[i], NULL, 0);
+}
 
 int	init_commands(t_data *data, char *command_in)
 {
@@ -63,16 +74,21 @@ int	main(int argc, char *argv[], char *envp[])
 		// lexer + parser
 		init_commands(&data, command_in);
 		// not sure to protect with if -1, exit
-		status = 0;
-		i = -1;
-		while (++i < data.nr_cmds)
+		status = 1;
+		if (data.nr_cmds > 1)
+			status = init_pipes(&data);
+		if (status)
 		{
-			printf("Begin executing %s\n", data.cmd[i].params[0]);
-			if (!exec_prefork_builtins(&data.cmd[i]))
-				if (init_pipes(&data))
+			i = -1;
+			while (++i < data.nr_cmds)
+			{
+				if (!exec_prefork_builtins(&data.cmd[i]))
 					fork_function(&data.cmd[i]);
-			// not sure to protect with if -1, exit
+				// not sure to protect with if -1, exit
+			}
 		}
+		if (data.nr_cmds > 1)
+			finish_up(&data);
 		free(command_in);
 		command_in = NULL;
 	}

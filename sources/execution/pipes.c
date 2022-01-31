@@ -6,13 +6,13 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/27 10:03:37 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/27 15:42:36 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 13:54:35 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	close_all_except(t_data *data, int pipe, int index, char *cmd)
+void	close_all_except(t_data *data, int pipe, int index)
 {
 	int	i;
 
@@ -22,22 +22,14 @@ void	close_all_except(t_data *data, int pipe, int index, char *cmd)
 		if (i != pipe)
 		{
 			close(data->pipe_fd[i][0]);
-			printf("%s Closes: %d, %d\n", cmd, i, 0);
 			close(data->pipe_fd[i][1]);
-			printf("%s Closes: %d, %d\n", cmd, i, 1);
 		}
 		else
 		{
 			if (index == 0)
-			{
 				close(data->pipe_fd[i][1]);
-				printf("%s Closes: %d, %d\n", cmd, i, 1);
-			}
 			else
-			{
 				close(data->pipe_fd[i][0]);
-				printf("%s Closes: %d, %d\n", cmd, i, 0);
-			}
 		}
 	}
 }
@@ -68,14 +60,14 @@ int	pipe_function(t_cmd *cmd)
 {
 	if (cmd->id == 0)
 	{
-		close_all_except(cmd->data, 0, 1, cmd->params[0]);
+		close_all_except(cmd->data, 0, 1);
 		if (cmd->o_file[0] == NULL)
 			dup2(cmd->data->pipe_fd[0][1], STDOUT_FILENO);
 		close(cmd->data->pipe_fd[0][1]);
 	}
 	else if (cmd->id == (cmd->data->nr_cmds - 1))
 	{
-		close_all_except(cmd->data, cmd->id - 1, 0, cmd->params[0]);
+		close_all_except(cmd->data, cmd->id - 1, 0);
 		if (cmd->i_file[0] == NULL)
 			dup2(cmd->data->pipe_fd[cmd->id - 1][0], STDIN_FILENO);
 		close(cmd->data->pipe_fd[cmd->id - 1][0]);
@@ -90,17 +82,33 @@ int	pipe_function(t_cmd *cmd)
 		close(cmd->data->pipe_fd[cmd->id - 1][0]);
 		close(cmd->data->pipe_fd[cmd->id][1]);
 	}
+	// if (cmd->id == 0)
+	// {
+	// 	close(cmd->data->pipe[0]);
+	// 	dup2(cmd->data->pipe[1], STDOUT_FILENO);
+	// 	close(cmd->data->pipe[1]);
+	// }
+	// else
+	// {
+	// 	printf("Command %d is %s\n", cmd->id, cmd->params[0]);
+	// 	close(cmd->data->pipe[1]);
+	// 	dup2(cmd->data->pipe[0], STDIN_FILENO);
+	// 	close(cmd->data->pipe[0]);
+	// 	printf("%d is now duped\n", cmd->data->pipe[0]);
+	// }
 	return (1);
 }
 
 int	init_pipes(t_data *data)
 {
+	// if (pipe(data->pipe) == -1)
+	// 	printf("pipe failed");
+	// return (1);
 	int	i;
 
 	i = -1;
 	while (++i < (data->nr_cmds - 1))
 	{
-		printf("pipe %d is made\n", i);
 		if (pipe(data->pipe_fd[i]) == -1)
 		{
 			perror("error - pipe failed");
