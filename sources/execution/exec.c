@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 11:19:50 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/31 13:55:25 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 16:49:38 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	fork_function(t_cmd *cmd)
 			return (-1);
 		if (cmd->data->nr_cmds > 1)
 			if (pipe_function(cmd) == 0)
-				return(-1);
+				return (-1);
 		if (exec_builtins(cmd) == 1)
 			return (1);
 		else if (exec_nonbuiltins(cmd) == 1)
@@ -67,18 +67,6 @@ int	fork_function(t_cmd *cmd)
 			return (0);
 	}
 	return (0);
-	// else
-	// {
-	// 	if (cmd->data->nr_cmds > 1)
-	// 	{
-	// 		close(cmd->data->pipe[0]);
-	// 		close(cmd->data->pipe[1]);
-	// 	}
-	// 	i = -1;
-	// 	while (++i < cmd->data->nr_cmds)
-	// 		waitpid(cmd->data->process_id[cmd->id], NULL, 0);
-	// }
-	// return (1);
 }
 
 int	exec_prefork_builtins2(t_cmd *cmd, enum BI funct)

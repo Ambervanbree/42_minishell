@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:32:53 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/31 13:50:30 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 16:58:41 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,21 @@ void	finish_up(t_data *data)
 	int	i;
 
 	if (data->nr_cmds > 1)
+	{
 		close_all_except_two(data, -1);
+		i = -1;
+		while (++i < data->nr_cmds)
+		{
+			data->pipe_fd[i][0] = 0;
+			data->pipe_fd[i][1] = 0;
+		}
+	}
 	i = -1;
-	while (++i < data->nr_cmds)
+	while ((++i < data->nr_cmds) && data->process_id[i])
+	{
 		waitpid(data->process_id[i], NULL, 0);
+		data->process_id[i] = 0;
+	}
 }
 
 int	init_commands(t_data *data, char *command_in)
@@ -39,15 +50,17 @@ int	init_commands(t_data *data, char *command_in)
 		perror("malloc failed");
 		return (0);
 	}
+	printf("check\n");
 	i = -1;
 	while (++i < data->nr_cmds)
 	{
 		data->cmd[i].params = ft_split(commands[i], ' ');
-		data->cmd[i].o_file[0] = NULL;
-		data->cmd[i].i_file[0] = NULL;
+		data->cmd[i].o[0] = NULL;
+		data->cmd[i].i[0] = NULL;
 		data->cmd[i].out[0] = 0;
 		data->cmd[i].id = i;
 		data->cmd[i].data = data;
+		data->process_id[i] = 0;
 	}
 	return (1);
 }
@@ -87,9 +100,9 @@ int	main(int argc, char *argv[], char *envp[])
 				// not sure to protect with if -1, exit
 			}
 		}
-		if (data.nr_cmds > 1)
-			finish_up(&data);
+		finish_up(&data);
 		free(command_in);
 		command_in = NULL;
+	//	exit (0);
 	}
 }

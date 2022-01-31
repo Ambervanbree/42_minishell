@@ -6,7 +6,7 @@
 /*   By: avan-bre <avan-bre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 15:33:03 by avan-bre          #+#    #+#             */
-/*   Updated: 2022/01/31 13:50:22 by avan-bre         ###   ########.fr       */
+/*   Updated: 2022/01/31 16:58:48 by avan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ typedef struct	s_data
 typedef struct	s_cmd
 {
 	char	**params;
-	char	*i_file[2];
-	char	*o_file[2];
+	char	*i[2];
+	char	*o[2];
 	int		out[2];
 	int		fd_i[2];
 	int		fd_o[2];
